@@ -14,6 +14,9 @@ npm run build          # produces site/dist, plain static files
 Astro, Tailwind 4, no server. Every page is prerendered to a real HTML file, so
 deploy by copying `site/dist` anywhere that serves files.
 
+`CLAUDE.md` is the short version of everything below, plus the invariants worth
+not breaking — start there if you are picking this up cold.
+
 The paintings and the journal come from a database now, read **once, at build
 time**. Nothing here talks to it when someone visits: if the database is asleep
 or gone, the website is unaffected. See "Where content lives" below.
@@ -114,7 +117,7 @@ Two decisions worth keeping:
 
 ## No framework on the page
 
-The site ships about **1.3KB of JavaScript**, inlined, for the mobile menu and the
+The site ships about **1.4KB of JavaScript**, inlined, for the mobile menu and the
 lightbox. The previous version shipped 66KB of React so that a gallery overlay
 could open. The lightbox is now a native `<dialog>`, which gives modal semantics,
 focus trapping, backdrop and Escape to close correctly and for free.
