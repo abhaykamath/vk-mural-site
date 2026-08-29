@@ -1,0 +1,55 @@
+---
+import Footer from '../components/Footer.astro';
+import Masthead from '../components/Masthead.astro';
+import Base from '../layouts/Base.astro';
+import { localePath, t } from '../i18n';
+
+/*
+ * One 404 page, in English.
+ *
+ * A static host serves a single not-found document for every bad URL, including
+ * ones under /ml/ and /hi/, so it cannot know the reader's language. Rather than
+ * guess, it offers all three ways back.
+ */
+const strings = t('en');
+---
+
+<Base locale="en" title="Page not found" description="That page does not exist.">
+  <Masthead locale="en" />
+
+  <main class="grid min-h-[60vh] place-items-center py-24">
+    <div class="shell max-w-[52ch] text-center">
+      <p class="eyebrow justify-center">404</p>
+      <h1 class="mt-4 text-[2.2rem] md:text-[3rem]">This page does not exist</h1>
+      <p class="mx-auto mt-5 text-[1.1rem] text-soot-soft">
+        The link may be old, or there may be a typo in the address. The paintings are all still
+        here.
+      </p>
+
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a
+          href={localePath('en')}
+          class="rounded-full border border-manjadi bg-manjadi px-6 py-3 text-sm font-semibold text-lime no-underline"
+        >
+          {strings.nav.work}
+        </a>
+        <a
+          href={localePath('ml')}
+          lang="ml"
+          class="rounded-full border border-lime-edge px-6 py-3 text-sm no-underline transition-colors hover:border-soot-faint"
+        >
+          മലയാളം
+        </a>
+        <a
+          href={localePath('hi')}
+          lang="hi"
+          class="rounded-full border border-lime-edge px-6 py-3 text-sm no-underline transition-colors hover:border-soot-faint"
+        >
+          हिन्दी
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <Footer locale="en" />
+</Base>

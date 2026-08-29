@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Panchavarna: the five colours, in the order they reach the wall. -->
+  <rect width="32" height="32" fill="#F5F0E6"/>
+  <rect x="4"  y="4" width="24" height="4.8" fill="#CF9520"/>
+  <rect x="4"  y="8.8" width="24" height="4.8" fill="#A32D1C"/>
+  <rect x="4"  y="13.6" width="24" height="4.8" fill="#3D6B4C"/>
+  <rect x="4"  y="18.4" width="24" height="4.8" fill="#F5F0E6"/>
+  <rect x="4"  y="23.2" width="24" height="4.8" fill="#16130F"/>
+  <rect x="4" y="4" width="24" height="24" fill="none" stroke="#16130F" stroke-width="1.5"/>
+</svg>

@@ -1,0 +1,186 @@
+---
+import { paintings, t, whatsappHref, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale);
+const pieces = paintings(locale);
+const contactHref = whatsappHref(locale);
+
+const control =
+  'grid h-11 w-11 place-items-center rounded-full border border-lime/25 text-lime/80 ' +
+  'transition-colors hover:border-lime/50 hover:bg-lime/10 hover:text-lime';
+---
+
+{/*
+  A native <dialog>. The browser gives modal semantics, focus trapping, a backdrop
+  and Escape to close, correctly and for free, which is why this ships no
+  framework. Every painting's panel is rendered at build time and shown or hidden.
+
+  Layout decisions worth keeping:
+
+  - Three rows with a real gap, so the controls never sit flush against the
+    painting.
+  - Previous and next sit on the left and right margins on a wide screen, and in
+    a bottom bar on a phone where a thumb can actually reach them. Close stays
+    top right on its own, because it does something different from the arrows.
+  - The panel starts at the top and scrolls on short screens. Centring content
+    taller than its container clips it at both ends, which once hid the top of a
+    tall painting behind the toolbar and put the enquiry link out of reach.
+*/}
+<dialog
+  id="lightbox"
+  class="m-0 max-h-none max-w-none bg-transparent p-0 backdrop:bg-[#0b0908] open:fixed open:inset-0 open:h-full open:w-full"
+  aria-label={strings.work.viewLarger}
+>
+  <div class="grid h-full grid-rows-[auto_minmax(0,1fr)_auto] gap-5 p-4 lg:gap-8 lg:p-8">
+    {/* ---------------------------------------------------------- header */}
+    <header class="flex items-center justify-between">
+      {/* Leading zeros echo the numbered stages in the process section. */}
+      <p class="font-display text-sm tracking-[0.08em] text-lime/40 tabular-nums">
+        <span data-counter class="text-lime/85">01</span> / {String(pieces.length).padStart(2, '0')}
+      </p>
+      <button type="button" data-close aria-label={strings.lightbox.close} class={control}>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" /></svg>
+      </button>
+    </header>
+
+    {/* --------------------------------------------------------- content */}
+    <div class="relative min-h-0">
+      {
+        pieces.map((piece, index) => (
+          <div
+            data-panel={index}
+            hidden
+            class="grid h-full min-h-0 content-start justify-items-center gap-6 overflow-y-auto overscroll-contain lg:grid-cols-[minmax(0,1fr)_clamp(15rem,22vw,20rem)] lg:content-center lg:items-center lg:gap-14 lg:overflow-visible lg:px-16"
+          >
+            <img
+              src={`/${piece.src}`}
+              alt={piece.description}
+              class="max-h-[52vh] w-auto object-contain shadow-[0_2px_4px_rgba(0,0,0,0.4),0_40px_80px_-32px_rgba(0,0,0,0.95)] lg:max-h-[78vh] lg:justify-self-end"
+            />
+
+            <div class="max-w-[38ch] text-lime">
+              <h3 class="font-display text-[1.6rem] leading-tight font-semibold lg:text-[2.2rem]">
+                {piece.name}
+              </h3>
+              <p class="mt-3 text-[0.95rem] leading-relaxed text-lime/65">{piece.description}</p>
+
+              {/* A short brass rule, the same accent the dark sections use. */}
+              <hr class="mt-6 mb-5 h-px w-12 border-0 bg-manjal/70" />
+
+              <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 text-[0.9rem]">
+                {piece.widthInches && piece.heightInches ? (
+                  <>
+                    <dt class="pt-px text-[0.7rem] tracking-[0.12em] text-lime/40 uppercase">{strings.lightbox.size}</dt>
+                    <dd class="m-0 tabular-nums">
+                      {piece.widthInches} x {piece.heightInches} {strings.lightbox.inches}
+                    </dd>
+                  </>
+                ) : null}
+                {piece.days ? (
+                  <>
+                    <dt class="pt-px text-[0.7rem] tracking-[0.12em] text-lime/40 uppercase">{strings.lightbox.work}</dt>
+                    <dd class="m-0 tabular-nums">{piece.days} {strings.lightbox.days}</dd>
+                  </>
+                ) : null}
+                <dt class="pt-px text-[0.7rem] tracking-[0.12em] text-lime/40 uppercase">{strings.lightbox.medium}</dt>
+                <dd class="m-0">{strings.lightbox.mediumValue}</dd>
+              </dl>
+
+              <a
+                href={contactHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-7 inline-flex items-center gap-2 rounded-full border border-manjal/50 px-5 py-2.5 text-[0.85rem] font-semibold text-manjal no-underline transition-colors hover:border-manjal hover:bg-manjal/10"
+              >
+                {strings.lightbox.ask}
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </a>
+            </div>
+          </div>
+        ))
+      }
+
+      {/* Edge arrows sit in the margin the panel leaves with lg:px-16. */}
+      <button
+        type="button"
+        data-step="-1"
+        aria-label={strings.lightbox.previous}
+        class={`${control} absolute top-1/2 left-0 hidden -translate-y-1/2 lg:grid`}
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+      </button>
+      <button
+        type="button"
+        data-step="1"
+        aria-label={strings.lightbox.next}
+        class={`${control} absolute top-1/2 right-0 hidden -translate-y-1/2 lg:grid`}
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </div>
+
+    {/* Bottom bar on a phone: a thumb reaches here, not the top corners. */}
+    <footer class="flex items-center justify-center gap-4 lg:hidden">
+      <button type="button" data-step="-1" aria-label={strings.lightbox.previous} class={control}>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+      </button>
+      <button type="button" data-step="1" aria-label={strings.lightbox.next} class={control}>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </footer>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('lightbox') as HTMLDialogElement | null;
+  if (dialog) {
+    const panels = [...dialog.querySelectorAll<HTMLElement>('[data-panel]')];
+    const counter = dialog.querySelector<HTMLElement>('[data-counter]');
+    let current = 0;
+
+    const show = (index: number) => {
+      current = (index + panels.length) % panels.length;
+      panels.forEach((panel, i) => {
+        panel.hidden = i !== current;
+        // Reset the scroll position, or moving to a tall painting can land you
+        // halfway down where the previous one was left.
+        if (i === current) panel.scrollTop = 0;
+      });
+      if (counter) counter.textContent = String(current + 1).padStart(2, '0');
+    };
+
+    document.querySelectorAll<HTMLElement>('[data-open-piece]').forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        show(Number(trigger.dataset.openPiece));
+        dialog.showModal();
+      });
+    });
+
+    dialog.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest('[data-close]')) return dialog.close();
+      const step = target.closest<HTMLElement>('[data-step]');
+      if (step) return show(current + Number(step.dataset.step));
+      // The dialog element itself is the backdrop: all real content is nested.
+      if (target === dialog) dialog.close();
+    });
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') show(current + 1);
+      else if (event.key === 'ArrowLeft') show(current - 1);
+    });
+
+    // <dialog> handles focus and Escape, but not the page scrolling underneath.
+    dialog.addEventListener('close', () => document.body.classList.remove('overflow-hidden'));
+    const open = dialog.showModal.bind(dialog);
+    dialog.showModal = () => {
+      document.body.classList.add('overflow-hidden');
+      open();
+    };
+  }
+</script>

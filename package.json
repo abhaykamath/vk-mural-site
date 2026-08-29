@@ -1,0 +1,25 @@
+{
+  "name": "vandana-kamath-site",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Showcase website for Vandana Kamath, Kerala mural artist",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "audit": "astro build && astro preview --port 4321 & sleep 6 && AUDIT_ORIGIN=http://127.0.0.1:4321 node scripts/css-audit.mjs; kill %1"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.1.6",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "netlify-cli": "^27.0.2",
+    "puppeteer": "^25.4.0",
+    "typescript": "^5.7.2"
+  }
+}

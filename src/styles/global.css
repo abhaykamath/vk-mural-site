@@ -1,0 +1,271 @@
+@import 'tailwindcss';
+
+/*
+ * Vandana Kamath, Kerala mural artist.
+ *
+ * The palette is not invented. Kerala mural painting works in panchavarna, five
+ * colours ground from earth and plant, and those five are the entire visual
+ * system of this site. The tokens keep their Malayalam names, because that is
+ * what the colours are called and it keeps the connection to the art form
+ * visible in the code rather than only in the copy.
+ */
+@theme {
+  /* Chunnambu, shell lime. The prepared wall, and the page. */
+  --color-lime: #f5f0e6;
+  --color-lime-deep: #ece5d6;
+  --color-lime-edge: #ddd3bf;
+
+  /* Kari, lamp soot. Every outline in a mural is drawn in this, last. */
+  --color-soot: #16130f;
+  --color-soot-soft: #46403a;
+  --color-soot-faint: #7b7267;
+
+  /* Manjadi, red ochre. */
+  --color-manjadi: #a32d1c;
+
+  /* Manjal, turmeric. */
+  --color-manjal: #cf9520;
+
+  /* Eravikkara, leaf green. Reserved in the tradition for divine figures. */
+  --color-eravikkara: #3d6b4c;
+
+  /*
+   * Three scripts, three stacks. Eczar covers Latin and Devanagari, so English
+   * and Hindi share a display face. Malayalam is a different script entirely and
+   * needs Manjari, which was drawn for it.
+   */
+  --font-display: 'Eczar', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Karla', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-devanagari: 'Mukta', 'Noto Sans Devanagari', sans-serif;
+  --font-malayalam: 'Manjari', 'Noto Sans Malayalam', sans-serif;
+
+  --spacing-gap: clamp(4.5rem, 11vw, 9rem);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    /*
+     * The mobile menu is parked off the right edge when closed. `clip` rather
+     * than `hidden`, because `hidden` would turn the body into a scroll
+     * container and break the sticky masthead.
+     */
+    overflow-x: clip;
+    background: var(--color-lime);
+    color: var(--color-soot);
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  /*
+   * Malayalam and Devanagari build long compound words that Latin does not.
+   * A single word like തിരിച്ചെടുക്കാനാവാത്ത is wider than a phone at heading
+   * size, and because a grid item defaults to `min-width: auto` it will not
+   * shrink below its longest word: the track grows and the whole page scrolls
+   * sideways. Allowing a break is the safety net.
+   */
+  h1,
+  h2,
+  h3,
+  p,
+  figcaption {
+    overflow-wrap: break-word;
+  }
+
+  /* Lets grid and flex children shrink below their content, which is what
+     actually stops the track from expanding in the first place. */
+  .shell > *,
+  .shell > * > * {
+    min-width: 0;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-manjadi);
+    outline-offset: 3px;
+  }
+
+  /*
+   * Per script typography.
+   *
+   * Malayalam and Devanagari both carry marks above and below the baseline that
+   * Latin does not, so the same line height that looks generous in English looks
+   * cramped in either of them. They also have no case distinction, which makes
+   * tight letterspacing on headings read as noise rather than as style.
+   */
+  html[lang='ml'] body {
+    font-family: var(--font-malayalam);
+    line-height: 1.85;
+  }
+
+  html[lang='ml'] h1,
+  html[lang='ml'] h2,
+  html[lang='ml'] h3 {
+    font-family: var(--font-malayalam);
+    line-height: 1.35;
+    letter-spacing: 0;
+    font-weight: 700;
+  }
+
+  html[lang='hi'] body {
+    font-family: var(--font-devanagari);
+    line-height: 1.8;
+  }
+
+  html[lang='hi'] h1,
+  html[lang='hi'] h2,
+  html[lang='hi'] h3 {
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
+
+  /*
+   * Both scripts run longer than English for the same sentence, and their
+   * compounds cannot be hyphenated the way Latin can. Dropping the display size
+   * on small screens means the words fit whole instead of being broken, which
+   * matters more here than matching the English size exactly.
+   */
+  html[lang='ml'] h1,
+  html[lang='hi'] h1 {
+    font-size: clamp(1.9rem, 1.2rem + 3vw, 3.4rem);
+  }
+
+  html[lang='ml'] h2,
+  html[lang='hi'] h2 {
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.4rem);
+  }
+}
+
+@layer components {
+  /* The page gutter, used by every section. */
+  .shell {
+    width: min(1240px, 92vw);
+    margin-inline: auto;
+  }
+
+  /* Section marker: a small label with a rule trailing off it. */
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-manjadi);
+  }
+
+  .eyebrow::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    max-width: 6rem;
+    background: var(--color-lime-edge);
+  }
+
+  /* Uppercase and wide tracking do nothing useful for Malayalam or Devanagari. */
+  html[lang='ml'] .eyebrow,
+  html[lang='hi'] .eyebrow {
+    text-transform: none;
+    letter-spacing: 0.06em;
+    font-family: inherit;
+  }
+
+  .dark .eyebrow {
+    color: var(--color-manjal);
+  }
+
+  .dark .eyebrow::after {
+    background: color-mix(in srgb, var(--color-lime) 22%, transparent);
+  }
+
+  /*
+   * Every painting sits centred in a plate of common height, so portrait and
+   * landscape works hang on a shared centre line and their labels align, the way
+   * they would on a real wall.
+   *
+   * `min-height: 0` is load bearing: a grid item defaults to `min-height: auto`,
+   * which for an image resolves to its intrinsic height and silently overrides
+   * `max-height`, cropping the tall paintings.
+   */
+  .plate {
+    display: grid;
+    place-items: center;
+    height: clamp(260px, 30vw, 400px);
+    overflow: hidden;
+    padding: clamp(0.75rem, 2vw, 1.5rem);
+    background: var(--color-lime-deep);
+  }
+
+  .plate img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+    object-fit: contain;
+    transition: transform 700ms cubic-bezier(0.2, 0, 0.2, 1);
+  }
+
+  .piece:hover .plate img {
+    transform: scale(1.035);
+  }
+
+  /* Numbered because the order genuinely matters. A mural is built in stages and
+     the black outline cannot come first. */
+  .steps {
+    counter-reset: step;
+  }
+
+  .step {
+    counter-increment: step;
+  }
+
+  .step::before {
+    content: counter(step, decimal-leading-zero);
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    color: var(--color-manjadi);
+    margin-bottom: 0.65rem;
+  }
+
+  .prose-body p {
+    max-width: 68ch;
+    text-wrap: pretty;
+  }
+
+  .prose-body p + p {
+    margin-top: 1.15em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

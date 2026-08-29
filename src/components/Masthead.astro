@@ -1,0 +1,146 @@
+---
+import {
+  artist,
+  localePath,
+  LOCALE_NAMES,
+  LOCALES,
+  neutralPath,
+  t,
+  type Locale,
+} from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const strings = t(locale);
+
+/*
+ * The switcher holds the reader's position. Switching to Malayalam from an
+ * article lands on that same article in Malayalam, not on the home page, which
+ * is the single most annoying thing a multilingual site can get wrong.
+ */
+const here = neutralPath(Astro.url.pathname);
+
+const NAV = [
+  ['work', strings.nav.work],
+  ['tradition', strings.nav.tradition],
+  ['about', strings.nav.about],
+  ['journal', strings.nav.journal],
+  ['contact', strings.nav.contact],
+] as const;
+
+const home = localePath(locale);
+---
+
+<header
+  id="masthead"
+  class="sticky top-0 z-40 border-b border-transparent transition-colors data-[scrolled=true]:border-lime-edge"
+>
+  {/*
+    The blurred background is its own layer rather than a class on the header.
+    `backdrop-filter` makes an element a containing block for `position: fixed`
+    descendants, so with the blur on the header the mobile menu positioned itself
+    against the header instead of the viewport: `inset-y-0` stretched it to the
+    header's 120px rather than full height, and the links spilled out over the
+    page with no background behind them.
+  */}
+  <div class="absolute inset-0 -z-10 bg-lime/90 backdrop-blur"></div>
+
+  <div class="shell flex items-center gap-6 py-4">
+    <a href={home} class="mr-auto leading-tight no-underline">
+      <span class="block font-display text-xl font-semibold tracking-tight">{artist.displayName[locale]}</span>
+      <span class="mt-0.5 block text-[0.66rem] font-medium tracking-[0.16em] text-soot-faint uppercase"
+        >{strings.role}</span
+      >
+    </a>
+
+    <nav
+      id="nav"
+      aria-label={strings.nav.language}
+      class="fixed inset-y-0 right-0 left-[32%] hidden translate-x-full flex-col gap-0 border-l border-lime-edge bg-lime px-7 pt-22 pb-8 shadow-[-20px_0_50px_rgba(22,19,15,0.1)] transition-transform duration-[260ms] data-[open=true]:flex data-[open=true]:translate-x-0 lg:static lg:inset-auto lg:flex lg:translate-x-0 lg:flex-row lg:gap-7 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
+    >
+      {
+        NAV.map(([id, label]) => (
+          <a
+            href={`${home}#${id}`}
+            class="group relative border-b border-lime-deep py-4 text-lg font-medium text-soot-soft no-underline transition-colors hover:text-soot lg:border-0 lg:py-1.5 lg:text-[0.9rem]"
+          >
+            {label}
+            <span class="absolute inset-x-0 bottom-0 hidden h-px origin-left scale-x-0 bg-manjadi transition-transform duration-200 group-hover:scale-x-100 lg:block" />
+          </a>
+        ))
+      }
+
+      <div class="mt-6 flex gap-2 lg:mt-0 lg:ml-3 lg:border-l lg:border-lime-edge lg:pl-5">
+        {
+          LOCALES.map((code) => (
+            <a
+              href={localePath(code, here)}
+              hreflang={code}
+              lang={code}
+              aria-current={code === locale ? 'true' : undefined}
+              class="rounded-full border border-lime-edge px-3 py-1.5 text-sm no-underline transition-colors hover:border-soot-faint aria-[current]:border-manjadi aria-[current]:text-manjadi"
+            >
+              {LOCALE_NAMES[code]}
+            </a>
+          ))
+        }
+      </div>
+    </nav>
+
+    <button
+      id="menu-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="nav"
+      aria-label={strings.nav.openMenu}
+      data-label-open={strings.nav.openMenu}
+      data-label-close={strings.nav.closeMenu}
+      class="z-50 rounded-sm border border-lime-edge px-3 py-2.5 lg:hidden"
+    >
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <path class="[[aria-expanded=true]_&]:hidden" d="M3 7h18M3 12h18M3 17h18" />
+        <path class="hidden [[aria-expanded=true]_&]:block" d="M5 5l14 14M19 5L5 19" />
+      </svg>
+    </button>
+  </div>
+</header>
+
+<script>
+  /*
+   * Two small behaviours, no framework.
+   *
+   * The menu is `display: none` when closed rather than parked off screen: a
+   * fixed element past the right edge still counts toward the page's scrollable
+   * width, which lets the whole site scroll sideways on a phone, and its links
+   * stay reachable by keyboard.
+   */
+  const masthead = document.getElementById('masthead')!;
+  const toggle = document.getElementById('menu-toggle')!;
+  const nav = document.getElementById('nav')!;
+
+  const setOpen = (open: boolean) => {
+    nav.dataset.open = String(open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute(
+      'aria-label',
+      open ? toggle.dataset.labelClose! : toggle.dataset.labelOpen!,
+    );
+  };
+
+  toggle.addEventListener('click', () => setOpen(nav.dataset.open !== 'true'));
+  nav.addEventListener('click', (event) => {
+    if ((event.target as HTMLElement).closest('a')) setOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setOpen(false);
+  });
+
+  const onScroll = () => {
+    masthead.dataset.scrolled = String(window.scrollY > 12);
+  };
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>
