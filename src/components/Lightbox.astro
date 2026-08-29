@@ -1,5 +1,8 @@
 ---
-import { paintings as pieces, strings, whatsappHref } from '../data';
+import { Image } from 'astro:assets';
+import { getPaintings, strings, whatsappHref } from '../data';
+
+const pieces = await getPaintings();
 
 const control =
   'grid h-11 w-11 place-items-center rounded-full border border-lime/25 text-lime/80 ' +
@@ -48,9 +51,14 @@ const control =
             hidden
             class="grid h-full min-h-0 content-start justify-items-center gap-6 overflow-y-auto overscroll-contain lg:grid-cols-[minmax(0,1fr)_clamp(15rem,22vw,20rem)] lg:content-center lg:items-center lg:gap-14 lg:overflow-visible lg:px-16"
           >
-            <img
-              src={`/${piece.src}`}
+            <Image
+              src={piece.imageUrl}
+              width={piece.imageWidth}
+              height={piece.imageHeight}
+              widths={[720, 1080, 1440]}
+              sizes="(min-width: 1024px) 60vw, 92vw"
               alt={piece.description}
+              loading="lazy"
               class="max-h-[52vh] w-auto object-contain shadow-[0_2px_4px_rgba(0,0,0,0.4),0_40px_80px_-32px_rgba(0,0,0,0.95)] lg:max-h-[78vh] lg:justify-self-end"
             />
 

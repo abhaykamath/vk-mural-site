@@ -1,5 +1,3 @@
-import inventory from '../../../inventory.json';
-
 /**
  * Contact details and the artist's name.
  *
@@ -21,34 +19,10 @@ export const whatsappHref = `https://wa.me/${artist.whatsapp}?text=${encodeURICo
   "Hello Vandana, I saw your paintings on your website and I'd like to ask about your work.",
 )}`;
 
-/**
- * A painting, read from `inventory.json`.
+/*
+ * Paintings live in the CMS database now, not in `inventory.json`.
  *
- * That file is Vandana's own working record: the slug, the image, the real
- * measurements. It is the single source for what is on the site, so adding a
- * painting means adding an entry there and an image, and nothing else.
+ * `getPaintings` is re-exported here so the components keep importing
+ * everything about the site's content from one place.
  */
-export interface Painting {
-  slug: string;
-  name: string;
-  description: string;
-  src: string;
-  /**
-   * Null until Vandana supplies them. They are printed on the site as facts
-   * about her work, so a guess is worse than an omission: every place that shows
-   * them checks first and leaves the line out rather than inventing a number.
-   */
-  widthInches: number | null;
-  heightInches: number | null;
-  days: number | null;
-}
-
-export const paintings: Painting[] = inventory.paintings.map((piece) => ({
-  slug: piece.slug,
-  name: piece.name,
-  description: piece.description,
-  src: piece.src,
-  widthInches: piece.width_inches,
-  heightInches: piece.height_inches,
-  days: piece.time_taken_days,
-}));
+export { getPaintings, getHeroPainting, type Painting } from './supabase';

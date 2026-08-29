@@ -1,9 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
-import { artist, paintings as pieces, strings, whatsappHref } from '../data';
+import { Image } from 'astro:assets';
+import { artist, getPaintings, strings, whatsappHref } from '../data';
 import Lightbox from './Lightbox.astro';
 
-const hero = pieces.find((piece) => piece.slug === 'murali-krishna') ?? pieces[0]!;
+const pieces = await getPaintings();
+
+// Which painting leads the page is set in the CMS, not hardcoded here.
+const hero = pieces.find((piece) => piece.isHero) ?? pieces[0]!;
 
 const articles = (await getCollection('journal')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -42,9 +46,14 @@ const lead = 'mt-4 text-[1.1rem] leading-snug text-soot-soft md:text-[1.32rem]';
       </div>
 
       <figure class="m-0">
-        <img
-          src={`/${hero.src}`}
+        <Image
+          src={hero.imageUrl}
+          width={hero.imageWidth}
+          height={hero.imageHeight}
+          widths={[480, 768, 1024]}
+          sizes="(min-width: 1024px) 45vw, 90vw"
           alt={`${hero.name}. ${hero.description}`}
+          loading="eager"
           fetchpriority="high"
           class="mx-auto max-h-[min(66vh,560px)] w-auto max-w-full shadow-[0_1px_0_var(--color-lime-edge),0_30px_60px_-30px_rgba(22,19,15,0.5)]"
         />
@@ -77,7 +86,15 @@ const lead = 'mt-4 text-[1.1rem] leading-snug text-soot-soft md:text-[1.32rem]';
               class="piece block w-full cursor-pointer border-0 bg-transparent p-0 text-left"
             >
               <span class="plate block">
-                <img src={`/${piece.src}`} alt={piece.description} loading="lazy" />
+                <Image
+                  src={piece.imageUrl}
+                  width={piece.imageWidth}
+                  height={piece.imageHeight}
+                  widths={[320, 480, 720]}
+                  sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+                  alt={piece.description}
+                  loading="lazy"
+                />
               </span>
               <span
                 class="mt-5 grid grid-cols-[1fr_auto] items-baseline gap-x-6 gap-y-1.5 border-t border-lime-edge pt-4"

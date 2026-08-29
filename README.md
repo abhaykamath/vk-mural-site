@@ -6,12 +6,17 @@ reach her.
 ```bash
 cd site
 npm install
-npm run dev      # open the address it prints
-npm run build    # produces site/dist, plain static files
+cp .env.example .env   # then fill in SUPABASE_ANON_KEY
+npm run dev            # open the address it prints
+npm run build          # produces site/dist, plain static files
 ```
 
 Astro, Tailwind 4, no server. Every page is prerendered to a real HTML file, so
 deploy by copying `site/dist` anywhere that serves files.
+
+The paintings and the journal come from a database now, read **once, at build
+time**. Nothing here talks to it when someone visits: if the database is asleep
+or gone, the website is unaffected. See "Where content lives" below.
 
 ## Why prerendered rather than server rendered
 
@@ -47,14 +52,40 @@ the interface strings, and all of the journal articles.
 
 ## Where content lives
 
-- `inventory.json` at the repository root is her own record of the paintings: the
-  slug, the image, the real measurements. It is shared with the studio tool, and
-  it is the only place a painting is defined. Adding one means adding an entry
-  there and an image.
-- Articles are Markdown in `src/content/journal/`. Adding one means adding a
-  file; the filename is the slug and it gets a real URL automatically.
+**Paintings and journal articles are edited in the CMS**, which is a separate
+repository (`vk-mural-cms`) and writes to a Supabase database. This site reads
+that database during the build:
+
+- `src/data/supabase.ts` fetches published paintings and articles. It uses the
+  anon key, which row level security limits to reading published rows — it
+  cannot write, which is what makes it safe in a build environment.
+- `src/content.config.ts` feeds the articles into Astro's content collections,
+  so `getCollection('journal')` and `render(entry)` work exactly as they did
+  when these were markdown files.
+- Painting photographs live in Supabase Storage. Astro downloads each one during
+  the build and emits resized WebP with a `srcset`, so the published pages
+  reference local files and a visitor's browser never contacts Supabase.
+
+Everything else is still in the repository:
+
 - Every other word on the site is in `src/data/strings.ts`. Her name and contact
-  details are in `src/data/site.ts`.
+  details are in `src/data/site.ts`. These are not CMS-managed.
+- The portrait, `public/images/vandana.jpg`, is a local asset.
+
+Publishing a change in the CMS triggers a Netlify build, which is when the new
+content reaches the site — about a minute.
+
+### Building it
+
+Two environment variables are required, and the build fails loudly without them
+rather than publishing a site with nothing on it:
+
+```
+SUPABASE_URL=https://<ref>.supabase.co
+SUPABASE_ANON_KEY=<the anon / publishable key>
+```
+
+On Netlify they go under Site configuration → Environment variables.
 
 ## Before this goes public
 
@@ -63,6 +94,10 @@ the interface strings, and all of the journal articles.
   before launch.
 - **The three journal articles** are samples. The section works and each has a
   real URL, but the writing is placeholder.
+- **The reading times are wrong** on the three seeded articles: the frontmatter
+  claimed six or seven minutes and they are really about one. They were carried
+  over as-is so the migration changed nothing visible, and they correct
+  themselves the first time each article is saved in the CMS.
 
 ## Design notes
 
@@ -88,10 +123,8 @@ The studio tool still uses React. It is an application and genuinely needs it.
 
 ## Known limitations
 
-- The portrait is served at 896px wide, which is fine, but the paintings are at
-  full camera resolution.
-- Images are served at full resolution. If more paintings are added, run them
-  through the studio tool's website export and use the smaller sizes.
 - Stated dimensions do not always match the cropped image proportions, most
   noticeably on Buddha, so layout uses the images' real proportions and treats the
   inches as text.
+- The build downloads every painting from Supabase Storage each time, which adds
+  a few seconds. Fine at six paintings; worth caching if it ever becomes sixty.

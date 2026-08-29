@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
-import { artist, strings } from '../data';
+import { getImage } from 'astro:assets';
+import { artist, getHeroPainting, strings } from '../data';
 
 interface Props {
   /** Path below the root, for example '' or 'journal/why-the-gods-are-green'. */
@@ -10,7 +11,27 @@ interface Props {
   image?: string;
 }
 
-const { path = '', title, description, image = '/images/buddha.jpg' } = Astro.props;
+const { path = '', title, description, image } = Astro.props;
+
+/*
+ * The social card is the painting that leads the site.
+ *
+ * It used to be a hardcoded path to one particular file, which meant changing
+ * the lead painting in the CMS left every shared link still showing the old one.
+ * Generated here at build time, so it is a local file and follows the choice
+ * made in the CMS.
+ */
+const hero = await getHeroPainting();
+const heroCard = hero
+  ? await getImage({
+      src: hero.imageUrl,
+      width: 1200,
+      height: Math.round((1200 * hero.imageHeight) / hero.imageWidth),
+      format: 'jpeg',
+    })
+  : null;
+
+const socialImage = image ?? heroCard?.src ?? '/favicon.svg';
 
 const pageTitle = title ? `${title} | ${artist.name}` : strings.meta.title;
 const pageDescription = description ?? strings.meta.description;
@@ -35,7 +56,7 @@ const FONTS = 'family=Eczar:wght@400;500;600;700&family=Karla:wght@300;400;500;6
     <meta property="og:description" content={description ?? strings.meta.ogDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="en_IN" />
-    <meta property="og:image" content={new URL(image, Astro.site).href} />
+    <meta property="og:image" content={new URL(socialImage, Astro.site).href} />
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
