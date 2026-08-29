@@ -1,39 +1,27 @@
 ---
 import '../styles/global.css';
-import { alternates, artist, LOCALE_TAGS, localePath, t, type Locale } from '../i18n';
+import { artist, strings } from '../data';
 
 interface Props {
-  locale: Locale;
-  /** Language-neutral path, for example '' or 'journal/why-the-gods-are-green'. */
+  /** Path below the root, for example '' or 'journal/why-the-gods-are-green'. */
   path?: string;
   title?: string;
   description?: string;
   image?: string;
 }
 
-const { locale, path = '', title, description, image = '/images/buddha.jpg' } = Astro.props;
-const strings = t(locale);
+const { path = '', title, description, image = '/images/buddha.jpg' } = Astro.props;
 
 const pageTitle = title ? `${title} | ${artist.name}` : strings.meta.title;
 const pageDescription = description ?? strings.meta.description;
-const canonical = new URL(localePath(locale, path), Astro.site).href;
-const links = alternates(Astro.site, path);
+const canonical = new URL(path ? `/${path}/` : '/', Astro.site).href;
 
-/*
- * Fonts are loaded per script. Eczar covers Latin and Devanagari, so English and
- * Hindi share a display face; Malayalam is a different script entirely and needs
- * Manjari, which was drawn for it. A reader in one language never downloads the
- * fonts for the others.
- */
-const FONTS: Record<Locale, string> = {
-  en: 'family=Eczar:wght@400;500;600;700&family=Karla:wght@300;400;500;600',
-  hi: 'family=Eczar:wght@400;500;600;700&family=Mukta:wght@300;400;500;600',
-  ml: 'family=Manjari:wght@400;700&family=Karla:wght@300;400;500;600',
-};
+/** Eczar for display, Karla for body. Nothing else is loaded. */
+const FONTS = 'family=Eczar:wght@400;500;600;700&family=Karla:wght@300;400;500;600';
 ---
 
 <!doctype html>
-<html lang={locale} data-locale={locale}>
+<html lang="en-IN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -42,26 +30,17 @@ const FONTS: Record<Locale, string> = {
     <meta name="theme-color" content="#F5F0E6" />
     <link rel="canonical" href={canonical} />
 
-    {/* Every language points at every other, so search engines serve the right
-        one and do not treat the three as duplicates of each other. */}
-    {
-      links.map((alt) => (
-        <link rel="alternate" hreflang={LOCALE_TAGS[alt.locale]} href={alt.href} />
-      ))
-    }
-    <link rel="alternate" hreflang="x-default" href={links[0]!.href} />
-
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description ?? strings.meta.ogDescription} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:locale" content={LOCALE_TAGS[locale].replace('-', '_')} />
+    <meta property="og:locale" content="en_IN" />
     <meta property="og:image" content={new URL(image, Astro.site).href} />
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href={`https://fonts.googleapis.com/css2?${FONTS[locale]}&display=swap`} rel="stylesheet" />
+    <link href={`https://fonts.googleapis.com/css2?${FONTS}&display=swap`} rel="stylesheet" />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />

@@ -1,23 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
-import { artist, localePath, paintings, t, whatsappHref, type Locale } from '../i18n';
+import { artist, paintings as pieces, strings, whatsappHref } from '../data';
 import Lightbox from './Lightbox.astro';
 
-interface Props {
-  locale: Locale;
-}
-
-const { locale } = Astro.props;
-const strings = t(locale);
-const pieces = paintings(locale);
 const hero = pieces.find((piece) => piece.slug === 'murali-krishna') ?? pieces[0]!;
-const contactHref = whatsappHref(locale);
 
-const articles = (await getCollection('journal', ({ id }) => id.startsWith(`${locale}/`))).sort(
+const articles = (await getCollection('journal')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 
-const dateFormat = new Intl.DateTimeFormat(locale === 'en' ? 'en-IN' : `${locale}-IN`, {
+const dateFormat = new Intl.DateTimeFormat('en-IN', {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
@@ -45,7 +37,7 @@ const lead = 'mt-4 text-[1.1rem] leading-snug text-soot-soft md:text-[1.32rem]';
         >
           <span>{pieces.length} {strings.hero.notes.paintings}</span>
           <span>{strings.hero.notes.medium}</span>
-          <span>{artist.location[locale]}</span>
+          <span>{artist.location}</span>
         </div>
       </div>
 
@@ -235,7 +227,7 @@ const lead = 'mt-4 text-[1.1rem] leading-snug text-soot-soft md:text-[1.32rem]';
           <div class="grid gap-7 md:grid-cols-3 lg:gap-12">
             {articles.map((article) => (
               <a
-                href={localePath(locale, `journal/${article.id.split('/')[1]}`)}
+                href={`/journal/${article.id}/`}
                 class="group flex flex-col border-t-2 border-soot pt-5 no-underline transition-colors hover:border-manjadi"
               >
                 <span class="mb-3 flex gap-3 text-[0.75rem] tracking-[0.12em] text-soot-faint uppercase">
@@ -271,7 +263,7 @@ const lead = 'mt-4 text-[1.1rem] leading-snug text-soot-soft md:text-[1.32rem]';
 
       <div class="grid gap-4">
         <a
-          href={contactHref}
+          href={whatsappHref}
           target="_blank"
           rel="noopener noreferrer"
           class="flex items-center gap-4.5 border border-lime/20 bg-lime/5 px-6 py-5 no-underline transition-all hover:-translate-y-0.5 hover:border-lime/40 hover:bg-lime/10"
@@ -304,4 +296,4 @@ const lead = 'mt-4 text-[1.1rem] leading-snug text-soot-soft md:text-[1.32rem]';
   </section>
 </main>
 
-<Lightbox locale={locale} />
+<Lightbox />

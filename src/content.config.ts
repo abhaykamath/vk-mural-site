@@ -1,13 +1,7 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, z } from 'astro:content';
 
-/**
- * Journal articles, one folder per language.
- *
- * The id carries the locale, for example `en/why-the-gods-are-green`, so the
- * home page and the article routes can filter by language without a second
- * index. Adding a language means adding a folder.
- */
+/** Journal articles. One markdown file per article, the filename is the slug. */
 const journal = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/journal' }),
   schema: z.object({

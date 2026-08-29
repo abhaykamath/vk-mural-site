@@ -1,27 +1,5 @@
 ---
-import {
-  artist,
-  localePath,
-  LOCALE_NAMES,
-  LOCALES,
-  neutralPath,
-  t,
-  type Locale,
-} from '../i18n';
-
-interface Props {
-  locale: Locale;
-}
-
-const { locale } = Astro.props;
-const strings = t(locale);
-
-/*
- * The switcher holds the reader's position. Switching to Malayalam from an
- * article lands on that same article in Malayalam, not on the home page, which
- * is the single most annoying thing a multilingual site can get wrong.
- */
-const here = neutralPath(Astro.url.pathname);
+import { artist, strings } from '../data';
 
 const NAV = [
   ['work', strings.nav.work],
@@ -31,7 +9,7 @@ const NAV = [
   ['contact', strings.nav.contact],
 ] as const;
 
-const home = localePath(locale);
+const home = '/';
 ---
 
 <header
@@ -50,7 +28,7 @@ const home = localePath(locale);
 
   <div class="shell flex items-center gap-6 py-4">
     <a href={home} class="mr-auto leading-tight no-underline">
-      <span class="block font-display text-xl font-semibold tracking-tight">{artist.displayName[locale]}</span>
+      <span class="block font-display text-xl font-semibold tracking-tight">{artist.name}</span>
       <span class="mt-0.5 block text-[0.66rem] font-medium tracking-[0.16em] text-soot-faint uppercase"
         >{strings.role}</span
       >
@@ -58,7 +36,7 @@ const home = localePath(locale);
 
     <nav
       id="nav"
-      aria-label={strings.nav.language}
+      aria-label="Primary"
       class="fixed inset-y-0 right-0 left-[32%] hidden translate-x-full flex-col gap-0 border-l border-lime-edge bg-lime px-7 pt-22 pb-8 shadow-[-20px_0_50px_rgba(22,19,15,0.1)] transition-transform duration-[260ms] data-[open=true]:flex data-[open=true]:translate-x-0 lg:static lg:inset-auto lg:flex lg:translate-x-0 lg:flex-row lg:gap-7 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
     >
       {
@@ -72,22 +50,6 @@ const home = localePath(locale);
           </a>
         ))
       }
-
-      <div class="mt-6 flex gap-2 lg:mt-0 lg:ml-3 lg:border-l lg:border-lime-edge lg:pl-5">
-        {
-          LOCALES.map((code) => (
-            <a
-              href={localePath(code, here)}
-              hreflang={code}
-              lang={code}
-              aria-current={code === locale ? 'true' : undefined}
-              class="rounded-full border border-lime-edge px-3 py-1.5 text-sm no-underline transition-colors hover:border-soot-faint aria-[current]:border-manjadi aria-[current]:text-manjadi"
-            >
-              {LOCALE_NAMES[code]}
-            </a>
-          ))
-        }
-      </div>
     </nav>
 
     <button

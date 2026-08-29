@@ -1,19 +1,13 @@
 ---
-import { artist, localePath, t, type Locale } from '../i18n';
+import { artist, strings } from '../data';
 
-interface Props {
-  locale: Locale;
-}
-
-const { locale } = Astro.props;
-const strings = t(locale);
-const home = localePath(locale);
+const home = '/';
 ---
 
 <footer class="border-t border-lime-edge py-12 text-[0.85rem] text-soot-faint">
   <div class="shell flex flex-wrap items-baseline gap-x-8 gap-y-4">
     <p class="m-0">
-      &copy; {new Date().getFullYear()} {artist.displayName[locale]}. {strings.footer.rights}
+      &copy; {new Date().getFullYear()} {artist.name}. {strings.footer.rights}
     </p>
     <nav class="ms-auto flex gap-6">
       <a href={`${home}#work`} class="no-underline transition-colors hover:text-soot">{strings.nav.work}</a>

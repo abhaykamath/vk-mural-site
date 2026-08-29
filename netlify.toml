@@ -12,8 +12,9 @@
 [build.environment]
   NODE_VERSION = "24"
 
-# Astro writes real directories, for example /ml/index.html, so Netlify serves
-# them without any redirect rules. The only thing worth adding is a 404.
+# Astro writes real directories, for example /journal/<slug>/index.html, so
+# Netlify serves them without any redirect rules. The only thing worth adding
+# is a 404.
 [[redirects]]
   from = "/*"
   to = "/404.html"

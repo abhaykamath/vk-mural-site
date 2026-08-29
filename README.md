@@ -1,14 +1,13 @@
 # Vandana Kamath, showcase website
 
 Her paintings, an explanation of Kerala mural painting, writing, and two ways to
-reach her. In English, Malayalam and Hindi.
+reach her.
 
 ```bash
 cd site
 npm install
 npm run dev      # open the address it prints
 npm run build    # produces site/dist, plain static files
-npm run audit    # drives the built site in a real browser, 3 languages x 8 widths
 ```
 
 Astro, Tailwind 4, no server. Every page is prerendered to a real HTML file, so
@@ -22,29 +21,10 @@ the pages at build time achieves exactly that with nothing to run, patch or pay
 for. If content ever needs to change without a rebuild, Astro can switch a page to
 server rendering without a rewrite.
 
-Twelve pages are built: three home pages and three articles in each of three
-languages.
+Five pages are built: the home page, three articles and a 404.
 
-## Languages
-
-| Language | URL | Display face | Body face |
-|---|---|---|---|
-| English | `/` | Eczar | Karla |
-| Malayalam | `/ml/` | Manjari | Manjari |
-| Hindi | `/hi/` | Eczar | Mukta |
-
-Eczar covers Latin and Devanagari, so English and Hindi share a display face.
-Malayalam is a different script and needs Manjari, which was drawn for it. Fonts
-load per language, so nobody downloads a script they are not reading.
-
-Both Indic scripts also get more line height, no uppercase, no tight tracking, and
-smaller headings than English. That is not fussiness: a Malayalam compound like
-തിരിച്ചെടുക്കാനാവാത്ത is wider than a phone at English heading size.
-
-Every page carries `hreflang` for all three plus `x-default`, a canonical URL, and
-localized title, description and Open Graph tags. The language switcher keeps your
-position, so switching from a Malayalam article lands on the English version of
-that same article.
+The site is in English. Eczar sets the headings, Karla the body text. Every page
+carries a canonical URL and its own title, description and Open Graph tags.
 
 ## Whose words are whose
 
@@ -65,29 +45,23 @@ it is marked in the source.
 **Mine**, and therefore to be checked by her: the individual pigment descriptions,
 the interface strings, and all of the journal articles.
 
-**The Malayalam and Hindi are my translations**, including of her own words. Both
-files are marked `needsReview = true`. She is a native speaker and should read
-them before publication.
-
-The three files use identical keys, so `en.ts` and `ml.ts` can be read side by
-side while reviewing.
-
 ## Where content lives
 
-- `inventory.json` at the repository root is her own record of the paintings and
-  stays in English. It is shared with the studio tool.
-- Malayalam and Hindi painting titles and descriptions live in the i18n files
-  keyed by slug, as overrides, so her working file stays clean.
-- Articles are Markdown in `src/content/journal/<lang>/`. Adding one means adding
-  a file; it gets a real URL automatically.
-- Everything else is in `src/i18n/en.ts`, `ml.ts`, `hi.ts`.
+- `inventory.json` at the repository root is her own record of the paintings: the
+  slug, the image, the real measurements. It is shared with the studio tool, and
+  it is the only place a painting is defined. Adding one means adding an entry
+  there and an image.
+- Articles are Markdown in `src/content/journal/`. Adding one means adding a
+  file; the filename is the slug and it gets a real URL automatically.
+- Every other word on the site is in `src/data/strings.ts`. Her name and contact
+  details are in `src/data/site.ts`.
 
 ## Before this goes public
 
 - **The site domain** in `astro.config.mjs`, currently `vandanakamath.art`.
-  Canonical URLs, hreflang and the sitemap all derive from it, so it has to be
-  right before launch.
-- **The nine journal articles** are samples. The section works and each has a
+  Canonical URLs and the sitemap both derive from it, so it has to be right
+  before launch.
+- **The three journal articles** are samples. The section works and each has a
   real URL, but the writing is placeholder.
 
 ## Design notes
@@ -111,20 +85,6 @@ could open. The lightbox is now a native `<dialog>`, which gives modal semantics
 focus trapping, backdrop and Escape to close correctly and for free.
 
 The studio tool still uses React. It is an application and genuinely needs it.
-
-## The CSS audit
-
-`npm run audit` checks **computed styles**, not whether a class exists.
-
-That distinction is the reason it exists. `py-[--spacing-gap]` is valid Tailwind 3
-syntax; Tailwind 4 accepts it silently and emits `padding-block: --spacing-gap`,
-which is invalid CSS. The browser drops it, every section loses its vertical
-padding, and the build, the typecheck and the class list all look perfectly fine.
-In Tailwind 4 the syntax for reading a variable is `py-(--spacing-gap)`.
-
-The audit checks section padding, horizontal overflow, elements past the viewport,
-images that failed to load, clipped text, and console errors, across three
-languages and eight widths.
 
 ## Known limitations
 

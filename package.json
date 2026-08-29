@@ -7,8 +7,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro check && astro build",
-    "preview": "astro preview",
-    "audit": "astro build && astro preview --port 4321 & sleep 6 && AUDIT_ORIGIN=http://127.0.0.1:4321 node scripts/css-audit.mjs; kill %1"
+    "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
@@ -19,7 +18,6 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "netlify-cli": "^27.0.2",
-    "puppeteer": "^25.4.0",
     "typescript": "^5.7.2"
   }
 }
