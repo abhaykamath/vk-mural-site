@@ -92,9 +92,11 @@ On Netlify they go under Site configuration → Environment variables.
 
 ## Before this goes public
 
-- **The site domain** in `astro.config.mjs`, currently `vandanakamath.art`.
-  Canonical URLs and the sitemap both derive from it, so it has to be right
-  before launch.
+- **Point `keralamural.in` at the site.** The domain is bought but its DNS is
+  not set, so `astro.config.mjs` names an address that does not resolve yet.
+  Canonical URLs and the sitemap derive from it. Netlify overrides it with its
+  own `URL` during a build, so this only bites a local build — but it has to be
+  real before launch.
 - **The three journal articles** are samples. The section works and each has a
   real URL, but the writing is placeholder.
 - **The reading times are wrong** on the three seeded articles: the frontmatter

@@ -3,8 +3,12 @@
 The public site for **Vandana Kamath**, a Kerala mural painter: her paintings, an
 explanation of the art form, her journal, and two ways to reach her.
 
-Astro 7, Tailwind 4, prerendered, English only. Published at vandanakamath.art
-on Netlify.
+Astro 7, Tailwind 4, prerendered, English only. Built on Netlify.
+
+**The domain is `keralamural.in`, and it is not pointed at the site yet.** Until
+it is, the live address is the Netlify subdomain. `vandanakamath.art` appears
+nowhere any more — it was a placeholder that was never registered, and it sat in
+the config and the docs long enough to be mistaken for fact.
 
 ## The content is not in this repository
 

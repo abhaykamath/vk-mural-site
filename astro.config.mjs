@@ -36,7 +36,7 @@ export default defineConfig({
     process.env.DEPLOY_PRIME_URL ??
     process.env.URL ??
     process.env.SITE_URL ??
-    'https://vandanakamath.art',
+    'https://keralamural.in',
   output: 'static',
 
   /*
