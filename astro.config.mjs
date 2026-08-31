@@ -28,15 +28,26 @@ export default defineConfig({
   /*
    * Canonical links and the sitemap both derive from this.
    *
-   * Netlify sets URL and DEPLOY_PRIME_URL during its builds, so a deploy preview
-   * describes itself honestly instead of claiming to be the live domain. The
-   * fallback is the real address, which is what a plain local build uses.
+   * CONTEXT is what separates a production build from a preview — not the
+   * presence of DEPLOY_PRIME_URL, which Netlify sets on every build including
+   * production, where it is the branch address `main--<site>.netlify.app`.
+   * Reaching for it first therefore made the live site name a URL that is not
+   * the domain, in every canonical tag, every og:url and every sitemap entry.
+   * Search engines take that literally: the address people were sent to would
+   * have been the one address not credited with the content.
+   *
+   * So: production says the domain Netlify is serving it on, and everything
+   * else — a deploy preview, a branch deploy — describes itself honestly rather
+   * than claiming to be the live site. A local build with no CONTEXT set falls
+   * through to the real address.
    */
   site:
-    process.env.DEPLOY_PRIME_URL ??
-    process.env.URL ??
-    process.env.SITE_URL ??
-    'https://keralamural.in',
+    process.env.CONTEXT === 'production'
+      ? (process.env.URL ?? 'https://keralamural.in')
+      : (process.env.DEPLOY_PRIME_URL ??
+        process.env.URL ??
+        process.env.SITE_URL ??
+        'https://keralamural.in'),
   output: 'static',
 
   /*
